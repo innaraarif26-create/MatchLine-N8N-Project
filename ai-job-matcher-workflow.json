@@ -1,0 +1,91 @@
+{
+  "name": "AI Job Description Matcher",
+  "nodes": [
+    {
+      "id": "1",
+      "name": "Submit match request",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [250, 300],
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "job-match",
+        "responseMode": "responseNode",
+        "options": {}
+      }
+    },
+    {
+      "id": "2",
+      "name": "Build AI prompt",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [500, 300],
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "a1",
+              "name": "prompt",
+              "type": "string",
+              "value": "=Compare this job posting against this candidate's resume bullets.\n\nJOB POSTING:\n{{$json.body.jobPosting}}\n\nRESUME BULLETS:\n{{$json.body.resumeBullets}}\n\nReturn ONLY valid JSON, no markdown, no extra text, in this exact format:\n{\"matchPercentage\": 72, \"matchedSkills\": [\"skill or requirement that overlaps\", \"another one\"], \"missingSkills\": [\"requirement from the posting not covered by the resume\"], \"summary\": \"one short encouraging sentence about the overall fit\"}\n\nKeep each skill/requirement entry short (2-5 words). List at most 6 items per array, prioritizing the most important ones."
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "3",
+      "name": "Score match - Gemini",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [750, 300],
+      "parameters": {
+        "method": "POST",
+        "url": "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=YOUR_GEMINI_API_KEY",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"contents\": [{\n    \"parts\": [{ \"text\": {{JSON.stringify($json.prompt)}} }]\n  }]\n}",
+        "options": {}
+      }
+    },
+    {
+      "id": "4",
+      "name": "Parse AI response",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1000, 300],
+      "parameters": {
+        "jsCode": "const response = $input.first().json;\nconst rawText = response.candidates[0].content.parts[0].text;\nconst cleaned = rawText.replace(/```json|```/g, '').trim();\nconst result = JSON.parse(cleaned);\n\nreturn [{\n  json: {\n    matchPercentage: result.matchPercentage,\n    matchedSkills: result.matchedSkills,\n    missingSkills: result.missingSkills,\n    summary: result.summary\n  }\n}];"
+      }
+    },
+    {
+      "id": "5",
+      "name": "Respond with results",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [1250, 300],
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ $json }}",
+        "options": {}
+      }
+    }
+  ],
+  "connections": {
+    "Submit match request": {
+      "main": [[{ "node": "Build AI prompt", "type": "main", "index": 0 }]]
+    },
+    "Build AI prompt": {
+      "main": [[{ "node": "Score match - Gemini", "type": "main", "index": 0 }]]
+    },
+    "Score match - Gemini": {
+      "main": [[{ "node": "Parse AI response", "type": "main", "index": 0 }]]
+    },
+    "Parse AI response": {
+      "main": [[{ "node": "Respond with results", "type": "main", "index": 0 }]]
+    }
+  },
+  "active": false,
+  "settings": {},
+  "pinData": {}
+}
