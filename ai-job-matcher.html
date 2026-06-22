@@ -1,0 +1,801 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Matchline — AI Job Description Matcher</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Lora:ital,wght@0,500;0,600;1,500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #F5F7FA;
+  --paper: rgba(255,255,255,0.66);
+  --ink: #15181E;
+  --ink-muted: #6B7280;
+  --highlight: #FFE066;
+  --highlight-text: #4A3C00;
+  --gold: #C99A00;
+  --teal: #14746B;
+  --teal-dark: #0F5950;
+  --teal-pale: #E4F1EF;
+  --coral: #B5482F;
+  --coral-bg: #FBEDE9;
+  --border: rgba(226,229,234,0.7);
+  --glass-border: rgba(255,255,255,0.36);
+  --radius: 18px;
+  --shadow: 0 1px 3px rgba(20,24,30,0.05), 0 12px 34px rgba(20,24,30,0.08);
+  --glass-shadow: 0 14px 40px rgba(20,24,30,0.10);
+}
+
+* { box-sizing: border-box; }
+
+html { scroll-behavior: smooth; }
+
+body {
+  margin: 0;
+  background: radial-gradient(circle at top, #ffffff 0%, var(--bg) 45%, #edf2f7 100%);
+  color: var(--ink);
+  font-family: 'Inter', sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+a { color: inherit; }
+
+.wrap {
+  max-width: 1080px;
+  margin: 0 auto;
+  padding: 0 24px;
+}
+
+/* ===== NAV ===== */
+.site-nav {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  background: rgba(245,247,250,0.72);
+  backdrop-filter: blur(18px) saturate(140%);
+  -webkit-backdrop-filter: blur(18px) saturate(140%);
+  border-bottom: 1px solid var(--border);
+}
+
+.nav-inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 18px 24px;
+}
+
+.logo {
+  font-family: 'Inter', sans-serif;
+  font-weight: 800;
+  font-size: 19px;
+  letter-spacing: -0.02em;
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  text-decoration: none;
+}
+.logo .accent { color: var(--teal); }
+.logo .dot { color: var(--coral); }
+
+.nav-links {
+  display: flex;
+  gap: 32px;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  font-size: 15px;
+  font-weight: 500;
+}
+
+.nav-links a {
+  text-decoration: none;
+  color: var(--ink-muted);
+  padding-bottom: 4px;
+  border-bottom: 2px solid transparent;
+  transition: color 0.15s ease, border-color 0.15s ease;
+}
+.nav-links a:hover { color: var(--ink); }
+.nav-links a:focus-visible { outline: 2px solid var(--teal); outline-offset: 3px; }
+
+.nav-cta {
+  font-family: 'Inter', sans-serif;
+  font-weight: 600;
+  font-size: 14.5px;
+  color: white;
+  background: linear-gradient(135deg, var(--teal), var(--teal-dark));
+  text-decoration: none;
+  padding: 10px 20px;
+  border-radius: 999px;
+  transition: transform 0.15s ease;
+  white-space: nowrap;
+  box-shadow: var(--glass-shadow);
+}
+.nav-cta:hover { transform: translateY(-1px); }
+
+@media (max-width: 700px) {
+  .nav-links { display: none; }
+}
+
+/* ===== HERO ===== */
+.hero { padding: 64px 0 80px; }
+
+.hero-grid {
+  display: grid;
+  grid-template-columns: 0.95fr 1.05fr;
+  gap: 48px;
+  align-items: center;
+}
+
+.eyebrow {
+  font-family: 'Inter', sans-serif;
+  font-weight: 600;
+  font-size: 14px;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--teal-dark);
+  margin: 0 0 14px;
+}
+
+.hero h1 {
+  font-family: 'Inter', sans-serif;
+  font-size: clamp(32px, 4.4vw, 48px);
+  line-height: 1.08;
+  margin: 0 0 18px;
+  letter-spacing: -0.03em;
+}
+.hero h1 .light { font-weight: 500; display: block; }
+.hero h1 .bold { font-weight: 800; display: block; }
+
+.hero .subhead {
+  font-size: 17.5px;
+  line-height: 1.65;
+  color: var(--ink-muted);
+  margin: 0 0 32px;
+  max-width: 460px;
+}
+
+.hero-cta-row {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  flex-wrap: wrap;
+}
+
+.btn-pill {
+  font-family: 'Inter', sans-serif;
+  font-weight: 600;
+  font-size: 15px;
+  color: white;
+  background: linear-gradient(135deg, var(--teal), var(--teal-dark));
+  border: none;
+  text-decoration: none;
+  padding: 14px 28px;
+  border-radius: 999px;
+  cursor: pointer;
+  box-shadow: var(--glass-shadow);
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+}
+.btn-pill:hover { transform: translateY(-2px); }
+.btn-pill svg { width: 14px; height: 14px; }
+
+.hero-meta {
+  font-family: 'Inter', sans-serif;
+  font-size: 12.5px;
+  color: var(--ink-muted);
+}
+
+.hero-visual {
+  position: relative;
+  border-radius: 22px;
+  overflow: hidden;
+  min-height: 420px;
+  background: linear-gradient(160deg, rgba(228,241,239,0.95), rgba(220,234,231,0.85));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: var(--glass-shadow);
+  backdrop-filter: blur(18px) saturate(140%);
+  -webkit-backdrop-filter: blur(18px) saturate(140%);
+}
+
+.hero-visual img {
+  width: 100%;
+  height: 100%;
+  min-height: 420px;
+  object-fit: cover;
+  object-position: 30% 38%;
+  display: block;
+}
+
+.hero-visual .placeholder-note {
+  font-family: 'Inter', sans-serif;
+  font-size: 14px;
+  color: var(--teal-dark);
+  text-align: center;
+  padding: 0 32px;
+  line-height: 1.6;
+}
+
+.hero-stat-card {
+  position: absolute;
+  left: 24px;
+  bottom: 24px;
+  background: rgba(255,255,255,0.72);
+  border: 1px solid var(--glass-border);
+  border-radius: 18px;
+  box-shadow: var(--glass-shadow);
+  padding: 16px 20px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  max-width: 240px;
+  backdrop-filter: blur(18px) saturate(140%);
+  -webkit-backdrop-filter: blur(18px) saturate(140%);
+}
+
+.hero-stat-card .stat-num {
+  font-family: 'Inter', sans-serif;
+  font-weight: 800;
+  font-size: 26px;
+  color: var(--teal);
+  line-height: 1;
+}
+
+.hero-stat-card .stat-text {
+  font-size: 12.5px;
+  color: var(--ink-muted);
+  line-height: 1.4;
+}
+
+@media (max-width: 700px) {
+  .hero-grid { grid-template-columns: 1fr; }
+  .hero-visual { order: -1; min-height: 280px; }
+  .hero-visual img { min-height: 280px; }
+  .hero { padding: 40px 0 56px; }
+}
+
+/* ===== STEPS ===== */
+.steps-section { padding: 8px 0 64px; }
+
+.steps-head {
+  text-align: center;
+  margin-bottom: 40px;
+}
+.steps-head .eyebrow { text-align: center; }
+.steps-head h2 {
+  font-family: 'Inter', sans-serif;
+  font-size: clamp(26px, 3.4vw, 32px);
+  font-weight: 800;
+  margin: 0;
+  letter-spacing: -0.02em;
+}
+
+.steps-row {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+}
+
+.step-card {
+  background: rgba(255,255,255,0.78);
+  border: 1.5px solid rgba(20,116,107,0.45);
+  border-radius: var(--radius);
+  box-shadow: 0 8px 20px rgba(20,24,30,0.06);
+  padding: 28px 26px;
+  backdrop-filter: blur(8px) saturate(115%);
+  -webkit-backdrop-filter: blur(8px) saturate(115%);
+}
+.step-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 14px 28px rgba(20,24,30,0.08);
+}
+
+.step-num {
+  font-family: 'Inter', sans-serif;
+  font-weight: 700;
+  font-size: 14px;
+  color: var(--teal-dark);
+  background: var(--teal-pale);
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 18px;
+}
+
+.step-card h3 {
+  font-family: 'Inter', sans-serif;
+  font-weight: 700;
+  font-size: 19px;
+  margin: 0 0 10px;
+  letter-spacing: -0.02em;
+}
+
+.step-card p {
+  font-size: 16px;
+  line-height: 1.6;
+  color: var(--ink-muted);
+  margin: 0;
+}
+
+@media (max-width: 700px) {
+  .steps-row { grid-template-columns: 1fr; }
+}
+
+/* ===== TOOL SECTION ===== */
+.tool-section {
+  background: rgba(255,255,255,0.45);
+  border-top: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+  padding: 64px 0 80px;
+  scroll-margin-top: 84px;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
+.tool-head {
+  margin-bottom: 32px;
+  max-width: 560px;
+}
+.tool-head h2 {
+  font-family: 'Inter', sans-serif;
+  font-size: clamp(26px, 3.4vw, 32px);
+  font-weight: 800;
+  margin: 0 0 10px;
+  letter-spacing: -0.02em;
+}
+.tool-head p {
+  font-size: 16.5px;
+  color: var(--ink-muted);
+  margin: 0;
+  line-height: 1.6;
+}
+
+.panels {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+  margin-bottom: 28px;
+}
+
+@media (max-width: 700px) {
+  .panels { grid-template-columns: 1fr; }
+}
+
+.panel {
+  background: rgba(255,255,255,0.68);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius);
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  box-shadow: var(--glass-shadow);
+  backdrop-filter: blur(16px) saturate(130%);
+  -webkit-backdrop-filter: blur(16px) saturate(130%);
+}
+
+.panel label {
+  font-family: 'Inter', sans-serif;
+  font-weight: 600;
+  font-size: 15px;
+  text-align: center;
+  margin-bottom: 10px;
+  color: var(--ink);
+}
+
+.panel textarea {
+  width: 100%;
+  min-height: 220px;
+  resize: vertical;
+  border: 1px solid var(--teal);
+  border-radius: 14px;
+  padding: 14px;
+  font-family: 'Inter', sans-serif;
+  font-size: 15px;
+  line-height: 1.6;
+  color: var(--ink);
+  background: rgba(255,255,255,0.95);
+  box-shadow: none;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+}
+
+.panel textarea:focus-visible {
+  outline: 2px solid rgba(20,116,107,0.35);
+  outline-offset: 2px;
+}
+
+.panel textarea:focus-visible {
+  outline: 2px solid rgba(20,116,107,0.55);
+  outline-offset: 1px;
+}
+.actions {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 8px;
+}
+
+button#compareBtn {
+  font-family: 'Inter', sans-serif;
+  font-weight: 700;
+  font-size: 15px;
+  color: white;
+  background: linear-gradient(135deg, var(--teal), var(--teal-dark));
+  border: none;
+  padding: 14px 32px;
+  border-radius: 999px;
+  cursor: pointer;
+  box-shadow: var(--glass-shadow);
+  transition: transform 0.15s ease, background 0.15s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+}
+
+button#compareBtn:hover { transform: translateY(-1px); }
+button#compareBtn:disabled { opacity: 0.6; cursor: progress; transform: none; }
+
+.spinner {
+  width: 14px;
+  height: 14px;
+  border: 2px solid rgba(255,255,255,0.4);
+  border-top-color: white;
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+  display: none;
+}
+button#compareBtn.loading .spinner { display: inline-block; }
+
+@keyframes spin { to { transform: rotate(360deg); } }
+
+.error-msg {
+  text-align: center;
+  color: var(--coral);
+  font-size: 14px;
+  margin: 12px 0 0;
+  display: none;
+}
+
+#results {
+  margin-top: 48px;
+  opacity: 0;
+  transform: translateY(14px);
+  transition: opacity 0.5s ease, transform 0.5s ease;
+}
+#results.show { opacity: 1; transform: translateY(0); }
+
+.score-block {
+  display: flex;
+  align-items: center;
+  gap: 28px;
+  background: rgba(255,255,255,0.72);
+  border: 1px solid var(--glass-border);
+  border-left: 4px solid var(--tier-color, var(--teal));
+  border-radius: var(--radius);
+  padding: 28px 32px;
+  margin-bottom: 24px;
+  box-shadow: var(--glass-shadow);
+  backdrop-filter: blur(18px) saturate(140%);
+  -webkit-backdrop-filter: blur(18px) saturate(140%);
+}
+
+.score-block.tier-strong { --tier-color: var(--teal); --tier-bg: var(--teal-pale); --tier-text: var(--teal-dark); }
+.score-block.tier-partial { --tier-color: var(--gold); --tier-bg: var(--highlight); --tier-text: var(--highlight-text); }
+.score-block.tier-weak { --tier-color: var(--coral); --tier-bg: var(--coral-bg); --tier-text: var(--coral); }
+
+.ring-wrap { position: relative; width: 120px; height: 120px; flex-shrink: 0; }
+.ring-wrap svg { transform: rotate(-90deg); width: 120px; height: 120px; }
+.ring-bg { fill: none; stroke: var(--border); stroke-width: 10; }
+.ring-fg {
+  fill: none;
+  stroke: var(--tier-color, var(--teal));
+  stroke-width: 10;
+  stroke-linecap: round;
+  transition: stroke-dashoffset 1s cubic-bezier(0.4,0,0.2,1), stroke 0.4s ease;
+}
+.ring-num {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Inter', sans-serif;
+  font-size: 26px;
+  font-weight: 800;
+  color: var(--tier-color, var(--ink));
+}
+
+.score-text .score-label {
+  font-family: 'Inter', sans-serif;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--ink-muted);
+  margin: 0 0 6px;
+}
+
+.tier-badge {
+  display: none;
+  font-family: 'Inter', sans-serif;
+  font-weight: 600;
+  font-size: 13px;
+  background: var(--tier-bg, var(--teal-pale));
+  color: var(--tier-text, var(--teal-dark));
+  padding: 4px 12px;
+  border-radius: 999px;
+  margin: 0 0 10px;
+}
+.tier-badge.show { display: inline-block; }
+
+.score-text .summary {
+  font-size: 16.5px;
+  line-height: 1.55;
+  margin: 0;
+}
+
+.skill-cols {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+}
+@media (max-width: 700px) {
+  .skill-cols { grid-template-columns: 1fr; }
+}
+
+.skill-panel {
+  background: rgba(255,255,255,0.68);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius);
+  padding: 22px;
+  box-shadow: var(--glass-shadow);
+  backdrop-filter: blur(16px) saturate(130%);
+  -webkit-backdrop-filter: blur(16px) saturate(130%);
+}
+
+.skill-panel h3 {
+  font-family: 'Inter', sans-serif;
+  font-weight: 700;
+  font-size: 16px;
+  margin: 0 0 14px;
+}
+
+.chip-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.chip {
+  font-family: 'Inter', sans-serif;
+  font-weight: 500;
+  font-size: 14px;
+  padding: 6px 13px;
+  border-radius: 999px;
+}
+
+.chip.matched {
+  background: var(--highlight);
+  color: var(--highlight-text);
+}
+
+.chip.missing {
+  background: var(--coral-bg);
+  color: var(--coral);
+  border: 1px dashed var(--coral);
+}
+
+.empty-note {
+  font-size: 14px;
+  color: var(--ink-muted);
+  font-style: italic;
+}
+
+/* ===== FOOTER ===== */
+.site-footer {
+  padding: 36px 24px 48px;
+  text-align: center;
+}
+.site-footer p {
+  font-family: 'Inter', sans-serif;
+  font-size: 13.5px;
+  color: var(--ink-muted);
+  margin: 0;
+}
+.site-footer .logo { justify-content: center; margin-bottom: 10px; }
+
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  * { animation: none !important; transition: none !important; }
+}
+</style>
+</head>
+<body>
+
+<nav class="site-nav">
+  <div class="nav-inner wrap" style="padding-left:0;padding-right:0;">
+    <a href="#top" class="logo"><span class="accent">Match</span>line<span class="dot"></span></a>
+    <ul class="nav-links">
+      <li><a href="#how-it-works">How it works</a></li>
+      <li><a href="#tool">Try it</a></li>
+    </ul>
+    <a href="#tool" class="nav-cta">Run a match</a>
+  </div>
+</nav>
+
+<div id="top"></div>
+
+<section class="hero wrap">
+  <div class="hero-grid">
+    <div>
+      <p class="eyebrow">AI job description matcher</p>
+      <h1><span class="light">Know in seconds <br> if your resume</span><span class="bold">actually fits the role.</span></h1>
+      <p class="subhead">Paste in a job posting and your resume bullets. The AI lines them up side by side and shows you what overlaps, what's missing, and what to fix before you apply.</p>
+      <div class="hero-cta-row">
+        <a href="#tool" class="btn-pill">Run a match<svg viewBox="0 0 16 16" fill="none"><path d="M3 8h10M9 4l4 4-4 4" stroke="white" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
+        <span class="hero-meta">No sign-up — takes about 10 seconds</span>
+      </div>
+    </div>
+    <div class="hero-visual">
+      <img src="img.png" alt="A recruiter at her desk reviewing AI-matched candidate profiles on a laptop and monitor" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+      <div class="placeholder-note" style="display:none; height:100%; align-items:center; justify-content:center;">Drop your photo in here<br>(replace <code>hero-photo.png</code> in the code)</div>
+      <div class="hero-stat-card"><span class="stat-num">86%</span><span class="stat-text">average match score people see after one pass</span></div>
+    </div>
+  </div>
+</section>
+
+<section class="steps-section wrap" id="how-it-works">
+  <div class="steps-head"><p class="eyebrow">How it works</p><h2>Three steps, no formatting required.</h2></div>
+  <div class="steps-row">
+    <div class="step-card"><div class="step-num">01</div><h3>Paste the posting</h3><p>Drop in the full job description — requirements, nice-to-haves, all of it.</p></div>
+    <div class="step-card"><div class="step-num">02</div><h3>Add your bullets</h3><p>Paste your resume's experience, skills, and project lines as it is .</p></div>
+    <div class="step-card"><div class="step-num">03</div><h3>Get your score</h3><p>See a match score, what overlaps, and exactly what's missing.</p></div>
+  </div>
+</section>
+
+<section class="tool-section wrap" id="tool">
+  <div class="tool-head"><h2>Run the match</h2><p>Paste both pieces below. Nothing is saved — this only runs while the page is open.</p></div>
+
+  <div class="panels">
+    <div class="panel"><label for="jobPosting">The Job Posting</label><textarea id="jobPosting" placeholder="Paste the full job description here..."></textarea></div>
+    <div class="panel"><label for="resumeBullets">Your Resume Bullets</label><textarea id="resumeBullets" placeholder="Paste your experience, skills, and project bullets here..."></textarea></div>
+  </div>
+
+  <div class="actions"><button id="compareBtn"><span class="spinner"></span><span id="btnLabel">Compare</span></button></div>
+  <p class="error-msg" id="errorMsg">Something went wrong reaching the matcher. Check your connection and try again.</p>
+
+  <div id="results" aria-live="polite">
+    <div class="score-block" id="scoreBlock">
+      <div class="ring-wrap"><svg viewBox="0 0 120 120"><circle class="ring-bg" cx="60" cy="60" r="54"></circle><circle class="ring-fg" id="ringFg" cx="60" cy="60" r="54" stroke-dasharray="339.29" stroke-dashoffset="339.29"></circle></svg><div class="ring-num" id="ringNum">0%</div></div>
+      <div class="score-text"><p class="score-label">Match score</p><span class="tier-badge" id="tierBadge"></span><p class="summary" id="summaryText"></p></div>
+    </div>
+
+    <div class="skill-cols">
+      <div class="skill-panel"><h3>What matched</h3><div class="chip-row" id="matchedChips"></div></div>
+      <div class="skill-panel"><h3>What's missing</h3><div class="chip-row" id="missingChips"></div></div>
+    </div>
+  </div>
+</section>
+
+<footer class="site-footer">
+  <a href="#top" class="logo"><span class="accent">Match</span>line<span class="dot"></span></a>
+  <p>Scored by AI — use it as a starting point, not the final word.</p>
+</footer>
+
+<script>
+const WEBHOOK_URL = "https://newinnara.app.n8n.cloud/webhook-test/job-match";
+
+const btn = document.getElementById('compareBtn');
+const btnLabel = document.getElementById('btnLabel');
+const errorMsg = document.getElementById('errorMsg');
+const results = document.getElementById('results');
+const scoreBlock = document.getElementById('scoreBlock');
+const tierBadge = document.getElementById('tierBadge');
+const ringFg = document.getElementById('ringFg');
+const ringNum = document.getElementById('ringNum');
+const summaryText = document.getElementById('summaryText');
+const matchedChips = document.getElementById('matchedChips');
+const missingChips = document.getElementById('missingChips');
+
+const CIRCUMFERENCE = 339.29;
+
+const TIERS = [
+  { min: 75, name: 'strong', label: 'Strong match' },
+  { min: 45, name: 'partial', label: 'Partial match' },
+  { min: 0, name: 'weak', label: 'Needs work' }
+];
+
+function getTier(percent) {
+  return TIERS.find(t => percent >= t.min) || TIERS[TIERS.length - 1];
+}
+
+function applyTier(percent) {
+  const tier = getTier(percent);
+  scoreBlock.classList.remove('tier-strong', 'tier-partial', 'tier-weak');
+  scoreBlock.classList.add(`tier-${tier.name}`);
+  tierBadge.textContent = tier.label;
+  tierBadge.classList.add('show');
+}
+
+function renderChips(container, items, cls, emptyText) {
+  container.innerHTML = '';
+  if (!items || items.length === 0) {
+    container.innerHTML = `<span class="empty-note">${emptyText}</span>`;
+    return;
+  }
+  items.forEach(text => {
+    const span = document.createElement('span');
+    span.className = `chip ${cls}`;
+    span.textContent = text;
+    container.appendChild(span);
+  });
+}
+
+function animateRing(percent) {
+  const offset = CIRCUMFERENCE - (percent / 100) * CIRCUMFERENCE;
+  requestAnimationFrame(() => { ringFg.style.strokeDashoffset = offset; });
+
+  const duration = 900;
+  const start = performance.now();
+  function tick(now) {
+    const progress = Math.min((now - start) / duration, 1);
+    ringNum.textContent = Math.round(progress * percent) + '%';
+    if (progress < 1) requestAnimationFrame(tick);
+  }
+  requestAnimationFrame(tick);
+}
+
+btn.addEventListener('click', async () => {
+  const jobPosting = document.getElementById('jobPosting').value.trim();
+  const resumeBullets = document.getElementById('resumeBullets').value.trim();
+
+  if (!jobPosting || !resumeBullets) {
+    errorMsg.textContent = 'Paste both the job posting and your resume bullets first.';
+    errorMsg.style.display = 'block';
+    return;
+  }
+
+  errorMsg.style.display = 'none';
+  btn.classList.add('loading');
+  btn.disabled = true;
+  btnLabel.textContent = 'Matching...';
+  results.classList.remove('show');
+
+  try {
+    const res = await fetch(WEBHOOK_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ jobPosting, resumeBullets })
+    });
+
+    if (!res.ok) throw new Error('Request failed');
+    const data = await res.json();
+
+    summaryText.textContent = data.summary || '';
+    renderChips(matchedChips, data.matchedSkills, 'matched', 'No clear overlaps found yet.');
+    renderChips(missingChips, data.missingSkills, 'missing', 'Nothing missing — strong match.');
+
+    const percent = Math.max(0, Math.min(100, data.matchPercentage || 0));
+    applyTier(percent);
+
+    results.classList.add('show');
+    animateRing(percent);
+  } catch (err) {
+    errorMsg.textContent = 'Something went wrong reaching the matcher. Check your connection and try again.';
+    errorMsg.style.display = 'block';
+  } finally {
+    btn.classList.remove('loading');
+    btn.disabled = false;
+    btnLabel.textContent = 'Compare';
+  }
+});
+</script>
+
+</body>
+</html>
