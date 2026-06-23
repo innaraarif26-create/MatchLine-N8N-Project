@@ -42,6 +42,4 @@ This project does not use any database and does not store user data. All process
 
 Future versions of this project can include PDF resume upload support, ATS scoring simulation, multiple job comparison features, downloadable reports, and user authentication for saving history.
 
-👨‍💻 Author
 
-This project was built by Innara Arif as part of a portfolio focused on AI automation, web development, and real-world job preparation tools.
