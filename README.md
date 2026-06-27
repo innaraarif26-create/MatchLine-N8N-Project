@@ -42,4 +42,13 @@ This project does not use any database and does not store user data. All process
 
 Future versions of this project can include PDF resume upload support, ATS scoring simulation, multiple job comparison features, downloadable reports, and user authentication for saving history.
 
+<img width="1881" height="901" alt="image" src="https://github.com/user-attachments/assets/693338b8-2b4d-4fb0-ba80-ed53036fc2ac" />
+<img width="1886" height="889" alt="image" src="https://github.com/user-attachments/assets/2ed86433-0cc9-421d-b95e-4974a416e612" />
+<img width="1852" height="857" alt="image" src="https://github.com/user-attachments/assets/97d77d45-c27b-4b85-a3d9-74a752ac12cf" />
+<img width="1878" height="891" alt="image" src="https://github.com/user-attachments/assets/c68d2ac8-49a2-4240-9feb-4ad74aff9ce7" />
+
+
+
+
+
 
